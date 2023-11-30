@@ -1,0 +1,70 @@
+---
+title: "Estoques"
+subtitle: "Controle de Estoques Utilizando Cadeias de Markov"
+author:
+  - Salvador Alves Ferreira Netto (2022040141)
+  - Nicolas Monteiro ()
+  - Gustavo Aledi ()
+abstract: ""
+lang: pt
+format: 
+  pdf:
+    toc: true
+    fig-pos: "H"
+    #toc-title: "Summary"
+    toc-depth: 3
+    #toc-location: right
+    number-sections: true
+    number-depth: 3
+    documentclass: report
+    fig-cap-location: top
+    geometry:
+      - top=3cm
+      - left=3cm
+      - right=2cm
+      - bottom=2cm
+execute:
+  echo: false
+  warning: false
+  output: false
+---
+
+```{r}
+library(tidyverse)
+library(markovchain)
+```
+
+```{r}
+data = read.csv("datasets/data.csv", sep= ",")
+
+data = data %>% 
+  filter(Open == 1,
+         Promo == 0,
+         Store == 85) %>% 
+  select(-Store, -Open, -Promo)
+```
+
+
+```{r}
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
