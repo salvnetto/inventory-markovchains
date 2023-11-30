@@ -35,83 +35,21 @@ library(markovchain)
 library(igraph)
 ```
 
-```{r}
-data = read.csv("datasets/data.csv", sep= ",")
+# Introdução
 
-dados_teste2 = data %>% 
-  filter(Open == 1,
-         Promo == 0,
-         Store == 85) %>% 
-  select(-Store, -Open, -Promo, -Customers) %>% 
-  mutate(Sales = ceiling(Sales/1000),
-         InventoryStart = ceiling(runif(length(Sales), min(Sales), max(Sales))),
-         InventoryFinal = InventoryStart - Sales,
-         NextDay = lag(sort(DayOfWeek))) %>% 
-  arrange(DayOfWeek) %>% 
-  group_by(DayOfWeek)
+A gestão eficiente de estoque é um componente vital para o funcionamento bem-sucedido de qualquer negócio que lida com produtos tangíveis. A otimização dos níveis de estoque é crucial para garantir a disponibilidade de produtos para os clientes, ao mesmo tempo em que minimiza os custos de armazenamento e reposição.
 
-data = data %>% 
-  filter(Open == 1,
-         Promo == 0,
-         Store == 85) %>% 
-  select(-Store, -Open, -Promo, -Customers) %>% 
-  mutate(Sales = ceiling(Sales/1000),
-         InventoryStart = ceiling(runif(length(Sales), min(Sales), max(Sales))),
-         InventoryFinal = InventoryStart - Sales,
-         NextDay = lag(sort(DayOfWeek)))
+Neste contexto, os modelos de Cadeias de Markov têm sido amplamente aplicados na previsão e gestão de estoques, oferecendo uma abordagem analítica poderosa para entender as mudanças no nível de estoque ao longo do tempo. Esses modelos, baseados na teoria das probabilidades e processos estocásticos, permitem prever o comportamento futuro do estoque, considerando as transições probabilísticas entre diferentes estados.
 
-data = data[complete.cases(data), ]
+O **método s e S**, dentro do contexto das Cadeias de Markov, é uma estratégia popular para determinar os pontos de reabastecimento ideal. Ele consiste em estabelecer dois pontos de controle: o nível mínimo no estoque (s) e o nível máximo de estoque (S). Quando o estoque atinge o nível mínimo ou abaixo dele, uma nova encomenda é feita para reabastecer o estoque até o nível máximo estabelecido.
 
-data = data %>% 
-  pivot_wider(names_from = InventoryFinal, values_from = Sales) %>% 
-  select(-DayOfWeek, -Date, -StateHoliday, -SchoolHoliday, -NextDay)
-```
+O principal objetivo deste trabalho é explorar e aplicar o modelo de Cadeias de Markov em conjunto com o método s e S para a gestão de estoque. Este estudo buscará analisar como esses modelos podem ser utilizados para otimizar os níveis de estoque, minimizando os custos associados à manutenção de inventário sem comprometer a disponibilidade dos produtos para os clientes.
 
+Serão examinados os conceitos fundamentais das Cadeias de Markov, a aplicação do método s e S na gestão de estoque e como essas ferramentas analíticas podem ser empregadas na tomada de decisões estratégicas relacionadas à reposição de estoque. Além disso, serão discutidos casos práticos e exemplos para ilustrar a aplicação desses modelos em cenários do mundo real.
 
-```{r}
-as.matrix(data)
-```
+Por meio dessa pesquisa, busca-se fornecer insights valiosos sobre como os modelos de Cadeias de Markov e o método s e S podem ser implementados para melhorar a eficiência na gestão de estoques, contribuindo assim para o aprimoramento das práticas comerciais e a maximização dos resultados empresariais.
 
-```{r}
-dadost_teste = data %>%
-  group_by(InventoryStart) %>% 
-  summarise(InventoryStart = sum(InventoryStart))
-
-
-dados_teste2 = data %>% 
-  filter(Open == 1,
-         Promo == 0,
-         Store == 85) %>% 
-  select(-Store, -Open, -Promo, -Customers) %>% 
-  mutate(Sales = ceiling(Sales/1000),
-         InventoryStart = ceiling(runif(length(Sales), min(Sales), max(Sales))),
-         InventoryFinal = InventoryStart - Sales,
-         NextDay = lag(sort(DayOfWeek)))
-
-```
- 
-
-
-```{r}
-for (i in 1:nrow(data)) {
-  if (i == 1) {
-    # Para a primeira linha, o estoque atual é o valor inicial do estoque
-    data$[i] <- data[i]
-  } else {
-    # Para as próximas linhas, o estoque atual é o estoque anterior menos a quantidade de vendas atual
-    dados$Estoque_Atual[i] <- dados$Estoque_Atual[i - 1] - dados$Quantidade_Vendas[i - 1]
-  }
-}
-```
-
-
-
-
-
-
-
-
-
+Neste trabalho estamos simulando um caso bem simples de estoque de lojas aplicado. Com isso em mente, vamos supor que estamos pegando dados de uma loja que vende celulares na gutierez, nosso produto em questão é o novo iphone, iphone 13.
 
 
 
