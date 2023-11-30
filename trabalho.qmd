@@ -70,6 +70,7 @@ cadeia = new("markovchain", states= estados, transitionMatrix= trans_matrix, nam
 plot(cadeia,
     layout=layout.davidson.harel)
 ```
+
 ```{r}
 is.irreducible(cadeia)
 is.regular(cadeia)
@@ -92,6 +93,7 @@ recurrentStates(cadeia)
 
 absorbingStates(cadeia)
 ```
+
 
 ```{r}
 seq = markovchainSequence(n = 100, markovchain = cadeia, t0 = "-1")
