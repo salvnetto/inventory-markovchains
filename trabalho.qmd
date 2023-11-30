@@ -33,6 +33,7 @@ execute:
 library(tidyverse)
 library(markovchain)
 library(igraph)
+library(kableExtra)
 ```
 
 # Introdução
@@ -131,11 +132,40 @@ period(cadeia)
 period(cadeia2)
 
 ```
-Observando
+Observando o período da cadeia com a classe não essencial através do comando **period()** ele nós retorna o valor 0, isso se deve ao fato de que como existe uma calsse não essencial e por isso a cadeia é não irredutívele não existe probabilidade de retirno do estado -1 pra ele mesmo,por isso o peírodo é 0.
+Agora quando nós retiramos a classe não essencial da cadeia e ficamos apenas com as essencias temos que o período da cadeia é 1, isso se deve ao fato de que $d_i = mdc[n \geq p_{ii} \gt 0]$, o mínimo divisor comum de 1,2,3...
+é 1, logo, o período da cadeia é 1 podemos ver isso para as matrizes de ordem superior 2 e 3 abaixo:
 
 ```{r}
-seq = markovchainSequence(n = 100, markovchain = cadeia, t0 = "-1")
+n2 = trans_matrix2 %*% trans_matrix2 
+n3 = trans_matrix2 %*% trans_matrix2 %*% trans_matrix2
+
+n2
+n3
 ```
+
+
+```{r}
+previsao = markovchainSequence(n = 100, markovchain = cadeia, t0 = "-1")
+previsao
+
+
+```
+
+Por meio do comando **markovchainSequence()**, nós conseguimos fazer previões de qual a quantidade de estoques que nos temos em "n" passos, no nosso caso quisemos ver qual a quantidade de produtos que teremos em 100 dias começando com o estoque negativo, ao final de 100 dias nos estamos com 2 produtos no estoque. 
+
+```{r}
+tabela = table(previsao)
+df2 = as.data.frame(tabela)
+kable(df2, booktabs = T, linesep = "") %>% 
+  kable_styling(latex_options = c("stripped", "HOLD_position", "scale_down")) %>% 
+  row_spec(0, bold = T) %>% 
+  row_spec(1, bold = T, background  = "lightgray") %>% 
+  row_spec(3, bold = T, background  = "lightgray") %>% 
+  row_spec(5, bold = T, background  = "lightgray")
+```
+
+Essa tabela mostra a frequência com que cada quantidade de pordutos no estoque nos tivemos ao decorrer dos 100 dias, e podemos ver que as quantidades mais frequentes são 2, 3 e 4. 
 
 ```{r}
 noofVisitsDist(cadeia, 9, "-1")
@@ -156,12 +186,6 @@ transitionProbability(cadeia, "2", "4")
 meanNumVisits(cadeia)
 ```
 
-```{r}
-trans_matrix %*% trans_matrix %*% trans_matrix %*% trans_matrix  %*% trans_matrix %*% trans_matrix 
-```
-```{r}
 
-trans_matrix2 %*% trans_matrix2 %*% trans_matrix2 %*% trans_matrix2  %*% trans_matrix2 %*% trans_matrix2 
-```
 
 
