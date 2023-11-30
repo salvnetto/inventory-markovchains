@@ -38,6 +38,18 @@ library(igraph)
 ```{r}
 data = read.csv("datasets/data.csv", sep= ",")
 
+dados_teste2 = data %>% 
+  filter(Open == 1,
+         Promo == 0,
+         Store == 85) %>% 
+  select(-Store, -Open, -Promo, -Customers) %>% 
+  mutate(Sales = ceiling(Sales/1000),
+         InventoryStart = ceiling(runif(length(Sales), min(Sales), max(Sales))),
+         InventoryFinal = InventoryStart - Sales,
+         NextDay = lag(sort(DayOfWeek))) %>% 
+  arrange(DayOfWeek) %>% 
+  group_by(DayOfWeek)
+
 data = data %>% 
   filter(Open == 1,
          Promo == 0,
@@ -60,12 +72,37 @@ data = data %>%
 as.matrix(data)
 ```
 
+```{r}
+dadost_teste = data %>%
+  group_by(InventoryStart) %>% 
+  summarise(InventoryStart = sum(InventoryStart))
 
 
+dados_teste2 = data %>% 
+  filter(Open == 1,
+         Promo == 0,
+         Store == 85) %>% 
+  select(-Store, -Open, -Promo, -Customers) %>% 
+  mutate(Sales = ceiling(Sales/1000),
+         InventoryStart = ceiling(runif(length(Sales), min(Sales), max(Sales))),
+         InventoryFinal = InventoryStart - Sales,
+         NextDay = lag(sort(DayOfWeek)))
+
+```
+ 
 
 
-
-
+```{r}
+for (i in 1:nrow(data)) {
+  if (i == 1) {
+    # Para a primeira linha, o estoque atual é o valor inicial do estoque
+    data$[i] <- data[i]
+  } else {
+    # Para as próximas linhas, o estoque atual é o estoque anterior menos a quantidade de vendas atual
+    dados$Estoque_Atual[i] <- dados$Estoque_Atual[i - 1] - dados$Quantidade_Vendas[i - 1]
+  }
+}
+```
 
 
 
