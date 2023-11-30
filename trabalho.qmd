@@ -2,9 +2,9 @@
 title: "Estoques"
 subtitle: "Controle de Estoques Utilizando Cadeias de Markov"
 author:
-  - Salvador Alves Ferreira Netto (2022040141)
-  - Nicolas Monteiro ()
-  - Gustavo Aledi ()
+  - Salvador Netto (2022040141)
+  - Nicolas Monteiro (2022039950)
+  - Gustavo Aledi (2022040290)
 abstract: ""
 lang: pt
 format: 
@@ -33,66 +33,74 @@ execute:
 library(tidyverse)
 library(markovchain)
 library(igraph)
-library(reticulate)
-```
-
-```{python}
-import pandas as pd
-import numpy as np 
 ```
 
 ```{r}
-data = read.csv("datasets/data.csv", sep= ",")
+data = read.csv("datasets/data.csv") %>% select(-X)
+data$X.1 = 0
+colnames(data) = c(-1:5)
+rownames(data) = c(-1:5)
 
-set.seed(123)
-
-data = data %>% 
-  filter(Open == 1,
-         Promo == 0,
-         Store == 85) %>% 
-  select(-Store, -Open, -Promo, -Customers) %>% 
-  mutate(Sales = ceiling(Sales/1000),
-         InventoryStart = ceiling(runif(length(Sales), min(Sales), max(Sales))),
-         NextDay = lag(sort(DayOfWeek)),
-         InventoryFinal = 0) %>% 
-  arrange(Date)
-
-data = data[complete.cases(data), ]
-```
-
-```{python}
-data = r.data
-
-szinho = 5
-szao = 16
-
-for i in range(len(data)):
-  data.iloc[i, 7] = data.iloc[i, 5] - data.iloc[i, 2]
-  if i+1 < len(data):
-    if data.iloc[i, 7] <= szinho:
-      data.iloc[i+1, 5] = szao
-    else:
-      data.iloc[i+1, 5] = data.iloc[i, 7]
-  
+trans_matrix = as.matrix(data)
+estados = as.character(c(-1:5))
 ```
 
 ```{r}
-data = py$data
+cadeia = new("markovchain", states= estados, transitionMatrix= trans_matrix, name= 'Estoque')
 ```
 
 ```{r}
-table(data$, data$ProximoDia)
+plot(cadeia,
+    layout=layout.davidson.harel)
+```
+```{r}
+is.irreducible(cadeia)
+is.regular(cadeia)
+meanRecurrenceTime(cadeia)
+steadyStates(cadeia)
 ```
 
+```{r}
+period(cadeia)
 
+communicatingClasses(cadeia)
 
+recurrentClasses(cadeia)
 
+transientClasses(cadeia)
 
+transientStates(cadeia)
 
+recurrentStates(cadeia)
 
+absorbingStates(cadeia)
+```
 
+```{r}
+seq = markovchainSequence(n = 100, markovchain = cadeia, t0 = "-1")
+```
 
+```{r}
+noofVisitsDist(cadeia, 9, "-1")
 
+```
 
+```{r}
+meanAbsorptionTime(cadeia)
+
+```
+
+```{r}
+transitionProbability(cadeia, "2", "4")
+
+```
+
+```{r}
+meanNumVisits(cadeia)
+```
+
+```{r}
+trans_matrix %*% trans_matrix %*% trans_matrix %*% trans_matrix  %*% trans_matrix %*% trans_matrix 
+```
 
 
