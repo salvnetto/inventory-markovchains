@@ -51,6 +51,19 @@ Por meio dessa pesquisa, busca-se fornecer insights valiosos sobre como os model
 
 Neste trabalho estamos simulando um caso bem simples de estoque de lojas aplicado. Com isso em mente, vamos supor que estamos pegando dados de uma loja que vende celulares na gutierez, nosso produto em questão é o novo iphone, iphone 13.
 
+# Aplicação
+
+![Exemplo](img/graph1.png)
+
+- $Z_n$ é a demanda no n-ésimo dia
+- $s$ é o nível mínimo do estoque
+- $S$ o nível máximo do estoque
+- $X_n$ é a quantidade no estoque depois de satisfazer a demanda e antes de utilizar a estratégia
+
+Se, após satisfazer a demanda $Z_n$, o estoque atinge o nível (inferior) $s$ então é feita a reposição do estoque
+até o nível (superior) $S$. Se o estoque não atinge o nível inferior $s$ então não é feita a reposição.
+
+$$X_{n+1}= \begin{cases} X_n - Z_{n+1}, & s<X_n<S. \\ S - Z_{n+1}, & X_n \leq s. \end{cases}$$
 
 ```{r}
 data = read.csv("datasets/data.csv") %>% select(-X)
@@ -67,59 +80,105 @@ cadeia = new("markovchain", states= estados, transitionMatrix= trans_matrix, nam
 ```
 
 ```{r}
+trans_matrix2 = trans_matrix[-1,-1]
+cadeia2 = new("markovchain", states= as.character(c(0:5)), transitionMatrix= trans_matrix2, name= 'Estoque')
+```
+
+```{r}
+#| output: true
+
+print(as.matrix(data))
+```
+
+```{r}
+#| output: true
+#| fig-cap: "Topologia da Cadeia"
+
 plot(cadeia,
     layout=layout.davidson.harel)
 ```
 
+Podemos observar através da topologia da cadeia em que não temos estados absorventes, ou seja, não há nenhum estado em que após chegar nele nunca mais sai, e isso faz sentido pois no nosso problema estamos lidando com estoques de loja, em nenhum momento o estoque de determinado produto vai ficar naquela mesma quantidade para sempre, pois temos as demandas, etc. Conseguimos ver também que temos uma classe não essencial que é referente ao estado $-1$ da cadeia, isso se deve ao fato de que ao atingirmos o limite inferior do estoque( definido como $s = 2$), nós repomos esse estoque até seu valor máximo ( definido como $S = 5$), então a partir do momento em que chegamos numa quantidade de estoque inferior a "$s$" repomos ele até "$S$". Os outros estados que estão abaixo do limite inferior ou o próprio não são considerados não essenciais pois, a nossa variável $Z_n$(a demanda do n-ésimo dia) foi definida como tendo as seguintes probabilidades:
+
+$P(Z_1 = 0) = 0.3$
+
+$P(Z_1 = 1) = 0.4$
+
+$P(Z_1 = 2) = 0.2$
+
+$P(Z_1 = 3) = 0.1$
+
+Visto isso, conseguimos observar que podemos ter $3, 2, 1$ vendas no dia e através da nossa matriz de transição os outros estados abaixo ou igual ao limite inferior são alcançados.
+
 ```{r}
+#| output: true
+#| echo: true
 is.irreducible(cadeia)
-is.regular(cadeia)
-meanRecurrenceTime(cadeia)
+```
+
+Através do comando **is.irreducible()** podemos observar que a cadeia não é irredutível com a saída sendo "FALSE", isso se deve ao fato de como vimos anteriormente na topologia da cadeia, em que nem todos os estados se comunicam ente si, portanto a cadeia não é irredutível, ela será se pegarmos uma classe apenas das essenciais. A vantagem de acharmos uma classe irredutível é por que com ela conseguimos achar a distribuição invariante, e conseguimos fazer previsões de estoque e demandas para n dias, conforme os dias vão passando a probabilidade da cadeia vai se tornando muito parecida com o próximo dia e se for aumentando os dias com $n \to \infty$ a diferença das probabilidades de transição estará na décima, vigésima... casa decimal.    
+
+```{r}
+#| output: true
+#| echo: true
+communicatingClasses(cadeia)
+```
+
+Como falado anteriormente, nem todos os estados se comunicam entre si e através do comando **communicationClasses()**, podemos notar que o estado $-1$ é o único que não se comunica com os demais. A comunicação entre os estados não precisa ser direta para haver comunicação, existe uma propriedade que diz que um estado $i$ que se comunica com um estado $j$, e esse estado $j$ se comunica com um estado $k$, o estado $i$ se comunica com $k$, se $i \to j, j \to k$ então $i \to k$.
+
+
+```{r}
+#| output: true
+#| echo: true
 steadyStates(cadeia)
 ```
 
+Com o comando **steadyStates()** conseguimos obter a distribuição invariante, nessa função já é pegada apenas as classes essenciais para realizar esse cálculo. A seguir, mostraremos que ao decorrer do dias a matriz de transição vai se tornando cada vez mais próxima da distribuição invariante. Realizaremos para $n$ (número de dias) igual a $2, 4, 6, 8 e 10$.
+
 ```{r}
-period(cadeia)
+#| output: true
+#| echo: true
 
-communicatingClasses(cadeia)
 
-recurrentClasses(cadeia)
+n2 = trans_matrix %*% trans_matrix 
+n4 = trans_matrix %*% trans_matrix %*% trans_matrix %*% trans_matrix
+n6 = trans_matrix %*% trans_matrix %*% trans_matrix %*% trans_matrix  %*% trans_matrix %*% trans_matrix 
+n10 = trans_matrix %*% trans_matrix %*% trans_matrix %*% trans_matrix  %*% trans_matrix %*% trans_matrix %*% trans_matrix %*% trans_matrix %*% trans_matrix %*% trans_matrix
 
-transientClasses(cadeia)
+n2
+n4
+n6
+n10
 
-transientStates(cadeia)
-
-recurrentStates(cadeia)
-
-absorbingStates(cadeia)
 ```
+
+Observando as saídas, podemos notar que a partir do sexto dia a matriz de transição já se torna extremamente semelhante aos valores da distribuição invariante.
+
+```{r}
+#| output: true
+#| echo: true
+meanRecurrenceTime(cadeia)
+```
+
+Através do comando **meanRecurrenceTime()**, ela nos retorna o número esperado de etapas necessárias para que o processo retorne a um determinado estado, começando desse estado. Isso é conhecido como "tempo de recorrência". Formalmente, a fórmula para o Tempo de Recorrência Médio é dado por: $M_i = \frac{1}{\pi_i}$, onde $\pi_i$ é a distribuição invariante. Pela saída dessa função, podemos observar novamente em que o estado -1 não tem um tempo médio de retorno para ele pois como já foi dito antes é uma classe não essencial, sendo mais uma forma de validar tudo que já foi dito anteriormente. O estado 3 retorna para ele em média 3,57 passos e é o estado que retorna mais rápido de nossa cadeia, isso faz sentido pois conforme vimos nos resultados da distribuição invariante $P_{ii} = 0.2803738$ com $i = 3$, ou seja, e o estado com a probabilidade de retorno mais alta da cadeia, e consequentemente em média retorna mais rápido também.
+
+
+```{r}
+#| output: true
+#| echo: true
+
+
+period(cadeia)
+period(cadeia2)
+
+```
+Observando
 
 
 ```{r}
 seq = markovchainSequence(n = 100, markovchain = cadeia, t0 = "-1")
 ```
 
-```{r}
-noofVisitsDist(cadeia, 9, "-1")
 
-```
-
-```{r}
-meanAbsorptionTime(cadeia)
-
-```
-
-```{r}
-transitionProbability(cadeia, "2", "4")
-
-```
-
-```{r}
-meanNumVisits(cadeia)
-```
-
-```{r}
-trans_matrix %*% trans_matrix %*% trans_matrix %*% trans_matrix  %*% trans_matrix %*% trans_matrix 
-```
 
 
