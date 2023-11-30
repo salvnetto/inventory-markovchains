@@ -32,6 +32,7 @@ execute:
 ```{r}
 library(tidyverse)
 library(markovchain)
+library(igraph)
 ```
 
 ```{r}
@@ -41,13 +42,22 @@ data = data %>%
   filter(Open == 1,
          Promo == 0,
          Store == 85) %>% 
-  select(-Store, -Open, -Promo)
+  select(-Store, -Open, -Promo, -Customers) %>% 
+  mutate(Sales = ceiling(Sales/1000),
+         InventoryStart = ceiling(runif(length(Sales), min(Sales), max(Sales))),
+         InventoryFinal = InventoryStart - Sales,
+         NextDay = lag(sort(DayOfWeek)))
+
+data = data[complete.cases(data), ]
+
+data = data %>% 
+  pivot_wider(names_from = InventoryFinal, values_from = Sales) %>% 
+  select(-DayOfWeek, -Date, -StateHoliday, -SchoolHoliday, -NextDay)
 ```
 
 
 ```{r}
-
-
+as.matrix(data)
 ```
 
 
