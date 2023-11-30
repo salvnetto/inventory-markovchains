@@ -2,9 +2,9 @@
 title: "Estoques"
 subtitle: "Controle de Estoques Utilizando Cadeias de Markov"
 author:
-  - Salvador Alves Ferreira Netto (2022040141)
-  - Nicolas Monteiro ()
-  - Gustavo Aledi ()
+  - Salvador Netto (2022040141)
+  - Nicolas Monteiro (2022039950)
+  - Gustavo Aledi (2022040290)
 abstract: ""
 lang: pt
 format: 
@@ -35,6 +35,7 @@ library(markovchain)
 library(igraph)
 ```
 
+<<<<<<< HEAD
 # Introdução
 
 A gestão eficiente de estoque é um componente vital para o funcionamento bem-sucedido de qualquer negócio que lida com produtos tangíveis. A otimização dos níveis de estoque é crucial para garantir a disponibilidade de produtos para os clientes, ao mesmo tempo em que minimiza os custos de armazenamento e reposição.
@@ -51,5 +52,74 @@ Por meio dessa pesquisa, busca-se fornecer insights valiosos sobre como os model
 
 Neste trabalho estamos simulando um caso bem simples de estoque de lojas aplicado. Com isso em mente, vamos supor que estamos pegando dados de uma loja que vende celulares na gutierez, nosso produto em questão é o novo iphone, iphone 13.
 
+=======
+```{r}
+data = read.csv("datasets/data.csv") %>% select(-X)
+data$X.1 = 0
+colnames(data) = c(-1:5)
+rownames(data) = c(-1:5)
+
+trans_matrix = as.matrix(data)
+estados = as.character(c(-1:5))
+```
+
+```{r}
+cadeia = new("markovchain", states= estados, transitionMatrix= trans_matrix, name= 'Estoque')
+```
+
+```{r}
+plot(cadeia,
+    layout=layout.davidson.harel)
+```
+```{r}
+is.irreducible(cadeia)
+is.regular(cadeia)
+meanRecurrenceTime(cadeia)
+steadyStates(cadeia)
+```
+
+```{r}
+period(cadeia)
+
+communicatingClasses(cadeia)
+
+recurrentClasses(cadeia)
+
+transientClasses(cadeia)
+
+transientStates(cadeia)
+
+recurrentStates(cadeia)
+
+absorbingStates(cadeia)
+```
+
+```{r}
+seq = markovchainSequence(n = 100, markovchain = cadeia, t0 = "-1")
+```
+
+```{r}
+noofVisitsDist(cadeia, 9, "-1")
+
+```
+
+```{r}
+meanAbsorptionTime(cadeia)
+
+```
+
+```{r}
+transitionProbability(cadeia, "2", "4")
+
+```
+
+```{r}
+meanNumVisits(cadeia)
+```
+
+```{r}
+trans_matrix %*% trans_matrix %*% trans_matrix %*% trans_matrix  %*% trans_matrix %*% trans_matrix 
+```
+>>>>>>> 58f16ace6aaa10b80fd5416bd72b9d0559e252df
 
 
