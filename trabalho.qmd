@@ -243,3 +243,5 @@ kable(df2, booktabs = T, linesep = "") %>%
 Essa tabela mostra a frequência com que cada quantidade de produtos no estoque nos tivemos ao decorrer dos $100$ dias, e podemos ver que as quantidades mais frequentes são $2, 3$ e $4$. 
 
 # Conclusão
+
+
