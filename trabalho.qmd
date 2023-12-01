@@ -16,7 +16,7 @@ format:
     #toc-location: right
     number-sections: true
     number-depth: 3
-    documentclass: report
+    documentclass: article
     fig-cap-location: top
     geometry:
       - top=3cm
@@ -85,21 +85,40 @@ trans_matrix2 = trans_matrix[-1,-1]
 cadeia2 = new("markovchain", states= as.character(c(0:5)), transitionMatrix= trans_matrix2, name= 'Estoque')
 ```
 
-```{r}
-#| output: true
+# Matriz e Topologia do Processo
 
-print(as.matrix(data))
-```
+$$\begin{array}{c|ccccccc}
+      & -1 & 0 & 1 & 2 & 3 & 4 & 5 \\
+\hline
+-1  & 0.0 & 0.0 & 0.0 & 0.1 & 0.2 & 0.4 & 0.3 \\
+0   & 0.0 & 0.0 & 0.0 & 0.1 & 0.2 & 0.4 & 0.3 \\
+1   & 0.0 & 0.0 & 0.0 & 0.1 & 0.2 & 0.4 & 0.3 \\
+2   & 0.0 & 0.0 & 0.0 & 0.1 & 0.2 & 0.4 & 0.3 \\
+3   & 0.0 & 0.1 & 0.2 & 0.4 & 0.3 & 0.0 & 0.0 \\
+4   & 0.0 & 0.0 & 0.1 & 0.2 & 0.4 & 0.3 & 0.0 \\
+5   & 0.0 & 0.0 & 0.0 & 0.1 & 0.2 & 0.4 & 0.3 \\
+\end{array}$$
+
 
 ```{r}
 #| output: true
 #| fig-cap: "Topologia da Cadeia"
 
+par(oma=c(0,0,0,0))
+par(mar=c(0,0,0,0))
+
 plot(cadeia,
-    layout=layout.davidson.harel)
+    #layout=layout.auto,
+    edge.label.cex = 0.7,
+    edge.arrow.size=.4, edge.curved=.2,
+    vertex.color="orange", 
+    vertex.frame.color="#555555",
+    vertex.label.color="black",
+    vertex.label.cex=.9)
+    #frame= TRUE,
 ```
 
-Podemos observar através da topologia da cadeia em que não temos estados absorventes, ou seja, não há nenhum estado em que após chegar nele nunca mais sai, e isso faz sentido pois no nosso problema estamos lidando com estoques de loja, em nenhum momento o estoque de determinado produto vai ficar naquela mesma quantidade para sempre, pois temos as demandas, etc. Conseguimos ver também que temos uma classe não essencial que é referente ao estado $-1$ da cadeia, isso se deve ao fato de que ao atingirmos o limite inferior do estoque( definido como $s = 2$), nós repomos esse estoque até seu valor máximo ( definido como $S = 5$), então a partir do momento em que chegamos numa quantidade de estoque inferior a "$s$" repomos ele até "$S$". Os outros estados que estão abaixo do limite inferior ou o próprio não são considerados não essenciais pois, a nossa variável $Z_n$(a demanda do n-ésimo dia) foi definida como tendo as seguintes probabilidades:
+Podemos observar através da topologia da cadeia em que não temos estados absorventes, ou seja, não há nenhum estado em que após chegar nele nunca mais sai, e isso faz sentido pois no nosso problema estamos lidando com estoques de loja, em nenhum momento o estoque de determinado produto vai ficar naquela mesma quantidade para sempre, pois temos as demandas, etc. Conseguimos ver também que temos uma classe não essencial que é referente ao estado $-1$ da cadeia, isso se deve ao fato de que ao atingirmos o limite inferior do estoque (definido como $s = 2$), nós repomos esse estoque até seu valor máximo (definido como $S = 5$), então a partir do momento em que chegamos numa quantidade de estoque inferior a "$s$" repomos ele até "$S$". Os outros estados que estão abaixo do limite inferior ou o próprio não são considerados não essenciais pois, a nossa variável $Z_n$ (a demanda do n-ésimo dia) foi definida como tendo as seguintes probabilidades:
 
 $P(Z_1 = 0) = 0.3$
 
@@ -110,6 +129,8 @@ $P(Z_1 = 2) = 0.2$
 $P(Z_1 = 3) = 0.1$
 
 Visto isso, conseguimos observar que podemos ter $3, 2, 1$ vendas no dia e através da nossa matriz de transição os outros estados abaixo ou igual ao limite inferior são alcançados.
+
+# Classes
 
 ```{r}
 #| output: true
@@ -127,6 +148,7 @@ communicatingClasses(cadeia)
 
 Como falado anteriormente, nem todos os estados se comunicam entre si e através do comando **communicationClasses()**, podemos notar que o estado $-1$ é o único que não se comunica com os demais. A comunicação entre os estados não precisa ser direta para haver comunicação, existe uma propriedade que diz que um estado $i$ que se comunica com um estado $j$, e esse estado $j$ se comunica com um estado $k$, o estado $i$ se comunica com $k$, se $i \to j, j \to k$ então $i \to k$.
 
+# Distribuição Invariante
 
 ```{r}
 #| output: true
@@ -134,7 +156,7 @@ Como falado anteriormente, nem todos os estados se comunicam entre si e através
 steadyStates(cadeia)
 ```
 
-Com o comando **steadyStates()** conseguimos obter a distribuição invariante, nessa função já é pegada apenas as classes essenciais para realizar esse cálculo. A seguir, mostraremos que ao decorrer do dias a matriz de transição vai se tornando cada vez mais próxima da distribuição invariante. Realizaremos para $n$ (número de dias) igual a $2, 4, 6, 8 e 10$.
+Com o comando **steadyStates()** conseguimos obter a distribuição invariante, nessa função já é pegada apenas as classes essenciais para realizar esse cálculo. A seguir, mostraremos que ao decorrer do dias a matriz de transição vai se tornando cada vez mais próxima da distribuição invariante. Realizaremos para $n$ (número de dias) igual a $2, 4, 6, 8$ e $10$.
 
 ```{r}
 #| output: true
@@ -154,6 +176,8 @@ n10
 ```
 
 Observando as saídas, podemos notar que a partir do sexto dia a matriz de transição já se torna extremamente semelhante aos valores da distribuição invariante.
+
+# Tempo de recorrência e Período
 
 ```{r}
 #| output: true
@@ -190,6 +214,7 @@ n2
 n3
 ```
 
+# Simulação
 
 ```{r}
 #| output: true
@@ -208,14 +233,13 @@ Por meio do comando **markovchainSequence()**, nós conseguimos fazer previsões
 tabela = table(previsao)
 df2 = as.data.frame(tabela)
 kable(df2, booktabs = T, linesep = "") %>% 
-  kable_styling(latex_options = c("stripped", "HOLD_position", "scale_down")) %>% 
+  kable_styling(latex_options = c("stripped", "HOLD_position")) %>% 
   row_spec(0, bold = T) %>% 
-  row_spec(1, bold = T, background  = "lightgray") %>% 
-  row_spec(3, bold = T, background  = "lightgray") %>% 
-  row_spec(5, bold = T, background  = "lightgray")
+  row_spec(1, background  = "lightgray") %>% 
+  row_spec(3, background  = "lightgray") %>% 
+  row_spec(5, background  = "lightgray")
 ```
 
-Essa tabela mostra a frequência com que cada quantidade de produtos no estoque nos tivemos ao decorrer dos $100$ dias, e podemos ver que as quantidades mais frequentes são $2, 3 e 4$. 
+Essa tabela mostra a frequência com que cada quantidade de produtos no estoque nos tivemos ao decorrer dos $100$ dias, e podemos ver que as quantidades mais frequentes são $2, 3$ e $4$. 
 
-
-
+# Conclusão
