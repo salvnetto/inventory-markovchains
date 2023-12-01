@@ -243,3 +243,10 @@ kable(df2, booktabs = T, linesep = "") %>%
 Essa tabela mostra a frequência com que cada quantidade de produtos no estoque nos tivemos ao decorrer dos $100$ dias, e podemos ver que as quantidades mais frequentes são $2, 3$ e $4$. 
 
 # Conclusão
+
+
+A gestão de estoque usando o método s e S demonstra ser eficaz para manter os níveis de estoque dentro de limites definidos, porém, apresenta desafios significativos. Alterações nas condições do mercado, sazonalidades e mudanças repentinas na demanda requerem ajustes frequentes nos pontos de reabastecimento s e S. Isso não apenas compromete a estabilidade do modelo, mas também torna o gerenciamento mais complexo.
+
+A inflexibilidade do modelo s e S diante de mudanças repentinas na demanda é outra limitação. As quantidades de reabastecimento são baseadas em previsões anteriores, tornando-se menos capazes de se adaptar rapidamente a mudanças imprevistas na demanda.
+
+Dessa forma, embora o método s e S ofereça um modelo estruturado para gerenciar estoques, é crucial reconhecer que a necessidade de ajustes frequentes e a dificuldade em lidar com variações abruptas na demanda podem tornar sua implementação e manutenção desafiadoras no ambiente dinâmico do mercado.
